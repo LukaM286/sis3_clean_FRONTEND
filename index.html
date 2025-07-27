@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Login</title>
+</head>
+<body>
+  <h1>Login</h1>
+  <form id="loginForm">
+    <label>
+      Username: <input type="text" id="username" name="username" required />
+    </label><br />
+    <label>
+      Password: <input type="password" id="password" name="password" required />
+    </label><br />
+    <button type="submit">Login</button>
+  </form>
+
+  <p id="message"></p>
+
+  <script>
+    const form = document.getElementById('loginForm');
+    const message = document.getElementById('message');
+
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const username = document.getElementById('username').value;
+  const password = document.getElementById('password').value;
+
+try {
+  const response = await fetch('http://localhost:7555/users/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username, password }),
+    credentials: 'include'
+  });
+
+  if (!response.ok) {
+    // Če strežnik vrne status različne od 200-299, preberi error iz bodyja
+    const errorData = await response.json();
+    message.textContent = `Napaka: ${errorData.message || 'Neznana napaka'}`;
+    return;
+  }
+
+  const data = await response.json();
+
+  if(data.success) {
+    message.textContent = 'Login uspešen! 🎉';
+  } else {
+    message.textContent = 'Napaka: ' + data.message;
+  }
+} catch (err) {
+  // Tukaj boš dobil dejanski error objekt
+  message.textContent = 'Napaka pri povezavi z backendom: ' + err.message;
+}
+
+});
+;
+  </script>
+</body>
+</html>
