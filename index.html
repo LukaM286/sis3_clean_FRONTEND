@@ -1,15 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Login</title>
   <style>
-    * {
-      box-sizing: border-box;
-      font-family: Arial, sans-serif;
-      transition: background 0.3s, color 0.3s;
-    }
     body {
       margin: 0;
       padding: 0;
@@ -18,11 +13,8 @@
       align-items: center;
       justify-content: center;
       height: 100vh;
+      font-family: Arial, sans-serif;
       color: #333;
-    }
-    body.dark {
-      background: #1e1e1e;
-      color: #f1f1f1;
     }
     .login-container {
       background: #fff;
@@ -32,16 +24,10 @@
       width: 100%;
       max-width: 350px;
     }
-    body.dark .login-container {
-      background: #2b2b2b;
-    }
     h1 {
       text-align: center;
       margin-bottom: 1.5rem;
       color: #444;
-    }
-    body.dark h1 {
-      color: #f1f1f1;
     }
     label {
       display: block;
@@ -55,11 +41,6 @@
       border: 1px solid #ccc;
       border-radius: 6px;
       font-size: 1rem;
-    }
-    body.dark input {
-      background: #3a3a3a;
-      border: 1px solid #555;
-      color: #f1f1f1;
     }
     button {
       width: 100%;
@@ -78,12 +59,7 @@
       text-align: center;
       margin-top: 1rem;
       font-size: 0.9rem;
-    }
-    .theme-toggle {
-      margin-top: 1rem;
-      text-align: center;
-      cursor: pointer;
-      color: #2575fc;
+      color: red;
     }
   </style>
 </head>
@@ -92,60 +68,52 @@
     <h1>Login</h1>
     <form id="loginForm">
       <label for="username">Username</label>
-      <input type="text" id="username" name="username" required>
+      <input type="text" id="username" name="username" required />
 
       <label for="password">Password</label>
-      <input type="password" id="password" name="password" required>
+      <input type="password" id="password" name="password" required />
 
       <button type="submit">Login</button>
     </form>
     <p id="message"></p>
-    <div class="theme-toggle" id="toggleTheme">Preklopi temo 🌙</div>
   </div>
 
   <script>
     const form = document.getElementById('loginForm');
     const message = document.getElementById('message');
-    const toggleTheme = document.getElementById('toggleTheme');
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
 
-      const username = document.getElementById('username').value;
-      const password = document.getElementById('password').value;
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value.trim();
 
       try {
         const response = await fetch('http://localhost:7555/users/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ username, password }),
-          credentials: 'include'
+          credentials: 'include', 
         });
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          message.textContent = `Napaka: ${errorData.message || 'Neznana napaka'}`;
-          return;
-        }
 
         const data = await response.json();
 
         if (data.success) {
-          message.textContent = 'Login uspešen! ';
+          if (data.role === 'zdravnik') {
+            window.location.href = 'dashboard.html?vloga=300';
+          } else if (data.role === 'pacient') {
+            window.location.href = 'dashboard.html?vloga=700';
+          } else if (data.role === 'admin') {
+            window.location.href = 'dashboard.html?vloga=900';
+          } else {
+            message.textContent = 'Neznana vloga uporabnika.';
+          }
         } else {
-          message.textContent = 'Napaka: ' + data.message;
+          message.textContent = data.message || 'Napaka pri prijavi.';
         }
       } catch (err) {
-        message.textContent = 'Napaka pri povezavi z backendom: ' + err.message;
+        message.textContent = 'Napaka pri povezavi na strežnik.';
       }
-    });
-
-    toggleTheme.addEventListener('click', () => {
-      document.body.classList.toggle('dark');
-      toggleTheme.textContent = 
-        document.body.classList.contains('dark') 
-          ? 'Preklopi temo ☀️' 
-          : 'Preklopi temo 🌙';
     });
   </script>
 </body>

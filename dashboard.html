@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dashboard</title>
+</head>
+<body>
+  <div id="content"></div>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const vloga = urlParams.get('vloga');
+    const content = document.getElementById('content');
+
+    if (vloga === '300') {
+      content.innerHTML = `
+        <h1>Dobrodošel, zdravnik!</h1>
+        <ul>
+          <li><a href="#">Pregled pacientov</a></li>
+          <li><a href="#">Dodaj nov zapis</a></li>
+        </ul>`;
+    } else if (vloga === '700') {
+      content.innerHTML = `
+        <h1>Dobrodošel, pacient!</h1>
+        <ul>
+          <li><a href="#">Moji podatki</a></li>
+          <li><a href="#">Zahteva za termin</a></li>
+        </ul>`;
+    } else if (vloga === '900') {
+      content.innerHTML = `
+        <h1>Dobrodošel, administrator!</h1>
+        <ul>
+          <li><a href="#">Urejanje uporabnikov</a></li>
+          <li><a href="#">Sistemski podatki</a></li>
+        </ul>`;
+    } else {
+      content.innerHTML = `<h1>Neznana vloga. Prosimo, prijavite se ponovno.</h1>`;
+    }
+  </script>
+</body>
+</html>
