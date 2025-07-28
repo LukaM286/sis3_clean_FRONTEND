@@ -99,6 +99,12 @@
         const data = await response.json();
 
         if (data.success) {
+
+            localStorage.setItem('name', username);
+            localStorage.setItem('role', data.role);
+            localStorage.setItem('vloga_id', data.vloga_id)
+
+
           if (data.role === 'zdravnik') {
             window.location.href = 'dashboard.html?vloga=300';
           } else if (data.role === 'pacient') {

@@ -1,9 +1,107 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="sl">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Dashboard</title>
+  <title>Dashboard - Zdravnik</title>
+  <style>
+    /* Osnovni reset in font */
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      background: #f4f7fa;
+      color: #333;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem;
+    }
+    h1 {
+      color: #2c3e50;
+      margin-bottom: 1rem;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 1rem 0 2rem 0;
+      display: flex;
+      gap: 1rem;
+    }
+    ul li a {
+      text-decoration: none;
+      background-color: #2980b9;
+      color: white;
+      padding: 0.7rem 1.4rem;
+      border-radius: 6px;
+      font-weight: 600;
+      box-shadow: 0 2px 6px rgba(41, 128, 185, 0.4);
+      transition: background-color 0.3s ease;
+      display: inline-block;
+    }
+    ul li a:hover {
+      background-color: #1c5d8a;
+    }
+    #formContainer {
+      background: white;
+      padding: 1.8rem 2rem;
+      border-radius: 10px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 480px;
+    }
+    form label {
+      display: block;
+      margin-top: 1rem;
+      font-weight: 600;
+      color: #34495e;
+    }
+    form input {
+      width: 100%;
+      padding: 0.5rem 0.7rem;
+      margin-top: 0.3rem;
+      border: 1.8px solid #bdc3c7;
+      border-radius: 6px;
+      font-size: 1rem;
+      transition: border-color 0.3s ease;
+    }
+    form input:focus {
+      border-color: #2980b9;
+      outline: none;
+    }
+    form button {
+      margin-top: 1.5rem;
+      background-color: #2980b9;
+      border: none;
+      color: white;
+      font-weight: 700;
+      padding: 0.7rem 0;
+      width: 100%;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 1.1rem;
+      box-shadow: 0 3px 8px rgba(41, 128, 185, 0.5);
+      transition: background-color 0.3s ease;
+    }
+    form button:hover {
+      background-color: #1c5d8a;
+    }
+    #formMessage {
+      margin-top: 1rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      min-height: 1.2rem;
+    }
+    #formMessage.error {
+      color: #e74c3c;
+    }
+    #formMessage.success {
+      color: #27ae60;
+    }
+  </style>
 </head>
 <body>
   <div id="content"></div>
@@ -12,17 +110,83 @@
     const urlParams = new URLSearchParams(window.location.search);
     const vloga = urlParams.get('vloga');
     const content = document.getElementById('content');
+    const name = localStorage.getItem('name');
 
     if (vloga === '300') {
       content.innerHTML = `
-        <h1>Dobrodošel, zdravnik!</h1>
+        <h1>Dobrodošel, dr. ${name}!</h1>
         <ul>
-          <li><a href="#">Pregled pacientov</a></li>
-          <li><a href="#">Dodaj nov zapis</a></li>
-        </ul>`;
+          <li><a href="#" id="pregledPacientov">Pregled pacientov</a></li>
+          <li><a href="#" id="dodajNovZapis">Dodaj novega pacienta</a></li>
+        </ul>
+        <div id="formContainer"></div>
+      `;
+
+      document.getElementById('dodajNovZapis').addEventListener('click', (e) => {
+        e.preventDefault();
+        const formContainer = document.getElementById('formContainer');
+        formContainer.innerHTML = `
+          <h2>Dodaj novega pacienta</h2>
+          <form id="newPatientForm" autocomplete="off">
+            <label for="id">ID:</label>
+            <input type="text" id="id" name="id" required />
+
+            <label for="username">Uporabniško ime:</label>
+            <input type="text" id="username" name="username" required />
+
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required />
+
+            <label for="password">Geslo:</label>
+            <input type="password" id="password" name="password" required />
+
+            <button type="submit">Dodaj pacienta</button>
+          </form>
+          <p id="formMessage"></p>
+        `;
+
+        document.getElementById('newPatientForm').addEventListener('submit', async (event) => {
+          event.preventDefault();
+          const form = event.target;
+          const data = {
+            id: form.id.value.trim(),
+            username: form.username.value.trim(),
+            email: form.email.value.trim(),
+            password: form.password.value.trim()
+          };
+
+          const formMessage = document.getElementById('formMessage');
+          formMessage.textContent = '';
+          formMessage.className = '';
+
+          try {
+            const response = await fetch('http://localhost:7555/users/new', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              credentials: 'include',
+              body: JSON.stringify(data)
+            });
+            const result = await response.json();
+
+            if (result.success) {
+              formMessage.classList.add('success');
+              formMessage.textContent = 'Pacient uspešno dodan!';
+              form.reset();
+            } else {
+              formMessage.classList.add('error');
+              formMessage.textContent = result.message || 'Napaka pri dodajanju pacienta.';
+            }
+          } catch (err) {
+            formMessage.classList.add('error');
+            formMessage.textContent = 'Napaka pri povezavi do strežnika.';
+          }
+        });
+      });
+
+      // Lahko dodaš še event listener za 'pregledPacientov', če želiš
     } else if (vloga === '700') {
       content.innerHTML = `
-        <h1>Dobrodošel, pacient!</h1>
+        <h1>Dobrodošel, ${name}!</h1>
         <ul>
           <li><a href="#">Moji podatki</a></li>
           <li><a href="#">Zahteva za termin</a></li>
