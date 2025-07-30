@@ -4,6 +4,8 @@ export default function Dashboard() {
   const [name, setName] = useState("");
   const [role, setRole] = useState("");
   const [vlogaId, setVlogaId] = useState("");
+  const [allUsers, setAllUsers] = useState([]);
+
   const [formData, setFormData] = useState({
     id: "",
     username: "",
@@ -17,6 +19,8 @@ export default function Dashboard() {
     const savedRole = localStorage.getItem("role");
     const savedVlogaId = localStorage.getItem("vloga_id");
 
+    
+
     if (savedName && savedRole && savedVlogaId) {
       setName(savedName);
       setRole(savedRole);
@@ -25,6 +29,23 @@ export default function Dashboard() {
       window.location.href = "/";
     }
   }, []);
+
+  useEffect(() => {
+  if (role === "zdravnik") {
+    fetch("http://localhost:7555/users/list", {
+      credentials: "include",
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          setAllUsers(data.users);
+        }
+      })
+      .catch(() => console.log("Napaka pri pridobivanju pacientov."));
+  }
+}, [role]);
+
+  
 
   const handleLogout = () => {
     localStorage.clear();
@@ -88,8 +109,34 @@ export default function Dashboard() {
               </button>
             </form>
             <p style={{ marginTop: "1rem", fontWeight: "bold" }}>{message}</p>
+          
+          <h2 style={{ marginTop: "2rem" }}>Seznam pacientov</h2>
+<table style={{ width: "100%", borderCollapse: "collapse" }}>
+  <thead>
+    <tr>
+      <th style={styles.th}>ID</th>
+      <th style={styles.th}>Uporabniško ime</th>
+      <th style={styles.th}>Email</th>
+    </tr>
+  </thead>
+  <tbody>
+    {allUsers.map((user) => (
+      <tr key={user.id}>
+        <td style={styles.td}>{user.id}</td>
+        <td style={styles.td}>{user.username}</td>
+        <td style={styles.td}>{user.email}</td>
+      </tr>
+    ))}
+  </tbody>
+</table>
+
+
+          
+          
+          
           </>
         )}
+        
 
         <button onClick={handleLogout} style={{ ...styles.button, background: "#e74c3c" }}>
           Odjava
@@ -98,6 +145,7 @@ export default function Dashboard() {
     </div>
   );
 }
+
 
 const styles = {
   container: {
@@ -128,4 +176,15 @@ const styles = {
     cursor: "pointer",
     fontWeight: "bold",
   },
+
+  th: {
+  textAlign: "left",
+  padding: "8px",
+  borderBottom: "2px solid #ccc",
+},
+td: {
+  padding: "8px",
+  borderBottom: "1px solid #eee",
+},
+
 };
