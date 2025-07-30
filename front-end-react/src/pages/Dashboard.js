@@ -4,6 +4,13 @@ export default function Dashboard() {
   const [name, setName] = useState("");
   const [role, setRole] = useState("");
   const [vlogaId, setVlogaId] = useState("");
+  const [formData, setFormData] = useState({
+    id: "",
+    username: "",
+    email: "",
+    password: "",
+  });
+  const [message, setMessage] = useState("");
 
   useEffect(() => {
     const savedName = localStorage.getItem("name");
@@ -24,13 +31,67 @@ export default function Dashboard() {
     window.location.href = "/";
   };
 
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleAddPatient = async (e) => {
+    e.preventDefault();
+    setMessage("");
+
+    try {
+      const response = await fetch("http://localhost:7555/users/new", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(formData),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setMessage("✅ Pacient uspešno dodan.");
+        setFormData({ id: "", username: "", email: "", password: "" });
+      } else {
+        setMessage(result.message || "Napaka pri dodajanju pacienta.");
+      }
+    } catch (error) {
+      setMessage("Napaka pri povezavi s strežnikom.");
+    }
+  };
+
   return (
     <div style={styles.container}>
       <div style={styles.box}>
         <h1>Dobrodošel, {name}!</h1>
         <p>Vloga: {role}</p>
-        <p>ID vloge: {vlogaId}</p>
-        <button onClick={handleLogout} style={styles.button}>
+
+        {role === "zdravnik" && (
+          <>
+            <h2>Dodaj novega pacienta</h2>
+            <form onSubmit={handleAddPatient} style={{ textAlign: "left" }}>
+              <label>ID:</label>
+              <input name="id" value={formData.id} onChange={handleInputChange} required />
+
+              <label>Uporabniško ime:</label>
+              <input name="username" value={formData.username} onChange={handleInputChange} required />
+
+              <label>Email:</label>
+              <input name="email" type="email" value={formData.email} onChange={handleInputChange} required />
+
+              <label>Geslo:</label>
+              <input name="password" type="password" value={formData.password} onChange={handleInputChange} required />
+
+              <button type="submit" style={{ ...styles.button, marginTop: "1rem" }}>
+                Dodaj pacienta
+              </button>
+            </form>
+            <p style={{ marginTop: "1rem", fontWeight: "bold" }}>{message}</p>
+          </>
+        )}
+
+        <button onClick={handleLogout} style={{ ...styles.button, background: "#e74c3c" }}>
           Odjava
         </button>
       </div>
@@ -56,16 +117,15 @@ const styles = {
     borderRadius: "12px",
     boxShadow: "0 4px 20px rgba(0, 0, 0, 0.2)",
     width: "100%",
-    maxWidth: "400px",
-    textAlign: "center",
+    maxWidth: "450px",
   },
   button: {
-    marginTop: "1rem",
     background: "#2575fc",
     color: "#fff",
-    padding: "0.5rem 1rem",
+    padding: "0.6rem 1.2rem",
     border: "none",
     borderRadius: "8px",
     cursor: "pointer",
+    fontWeight: "bold",
   },
 };
