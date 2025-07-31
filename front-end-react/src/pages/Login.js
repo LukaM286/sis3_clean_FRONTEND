@@ -24,6 +24,9 @@ export default function Login() {
         localStorage.setItem("name", username);
         localStorage.setItem("role", data.role);
         localStorage.setItem("vloga_id", data.vloga_id);
+localStorage.setItem("userId", data.id);
+
+        
 
         navigate("/dashboard");
       } else {
