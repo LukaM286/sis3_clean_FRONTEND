@@ -110,25 +110,30 @@ export default function Dashboard() {
             </form>
             <p style={{ marginTop: "1rem", fontWeight: "bold" }}>{message}</p>
           
-          <h2 style={{ marginTop: "2rem" }}>Seznam pacientov</h2>
+<h2 style={{ marginTop: "2rem" }}>Seznam pacientov</h2>
 <table style={{ width: "100%", borderCollapse: "collapse" }}>
   <thead>
     <tr>
       <th style={styles.th}>ID</th>
-      <th style={styles.th}>Uporabniško ime</th>
+      <th style={styles.th}>Ime</th>
+      <th style={styles.th}>Priimek</th>
       <th style={styles.th}>Email</th>
+      <th style={styles.th}>Vloga</th>
     </tr>
   </thead>
   <tbody>
     {allUsers.map((user) => (
       <tr key={user.id}>
         <td style={styles.td}>{user.id}</td>
-        <td style={styles.td}>{user.username}</td>
+        <td style={styles.td}>{user.ime}</td>
+        <td style={styles.td}>{user.priimek}</td>
         <td style={styles.td}>{user.email}</td>
+        <td style={styles.td}>{user.vloga_id}</td>
       </tr>
     ))}
   </tbody>
 </table>
+
 
 
           
