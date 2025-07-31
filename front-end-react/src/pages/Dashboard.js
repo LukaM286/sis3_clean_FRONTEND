@@ -45,6 +45,25 @@ export default function Dashboard() {
   }
 }, [role]);
 
+const [kartoni, setKartoni] = useState([]);
+
+useEffect(() => {
+  if (role === "zdravnik") {
+    fetch("http://localhost:7555/users/kartoni", {
+      credentials: "include",
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success) {
+          setKartoni(data.kartoni);
+        }
+      })
+      .catch(() => console.log("Napaka pri pridobivanju kartonov."));
+  }
+}, [role]);
+
+
+
   
 
   const handleLogout = () => {
@@ -133,6 +152,27 @@ export default function Dashboard() {
     ))}
   </tbody>
 </table>
+
+<h2 style={{ marginTop: "2rem" }}>Seznam elektronskih kartonov</h2>
+<table style={{ width: "100%", borderCollapse: "collapse" }}>
+  <thead>
+    <tr>
+      <th style={styles.th}>Karton ID</th>
+      <th style={styles.th}>Pacient ID</th>
+      <th style={styles.th}>Opis</th>
+    </tr>
+  </thead>
+  <tbody>
+    {kartoni.map((karton) => (
+      <tr key={karton.id}>
+        <td style={styles.td}>{karton.id}</td>
+        <td style={styles.td}>{karton.pacient_id}</td>
+        <td style={styles.td}>{karton.opis || "-"}</td>
+      </tr>
+    ))}
+  </tbody>
+</table>
+
 
 
 
