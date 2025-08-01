@@ -12,6 +12,10 @@ export default function Dashboard() {
   const [mojKarton, setMojKarton] = useState(null);
   const [kartonMsg, setKartonMsg] = useState("");
 
+  const [obravnave, setObravnave] = useState([]);
+  const [diagnoze, setDiagnoze] = useState([]);
+  const [selectedObravnava, setSelectedObravnava] = useState(null);
+
 
   const [formData, setFormData] = useState({
     id: "",
@@ -37,6 +41,19 @@ export default function Dashboard() {
   }
 }, [role, userId]);
 
+  const handleShowDiagnoze = (obravnavaId) => {
+    fetch(`/users/obravnava/${obravnavaId}/diagnoze`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          setDiagnoze(data.diagnoze);
+          setSelectedObravnava(obravnavaId);
+        } else {
+          setDiagnoze([]);
+        }
+      })
+      .catch(() => setDiagnoze([]));
+  };
 
 
 
@@ -338,6 +355,7 @@ const handleAddObravnava = async (e) => {
             <th style={styles.th}>Datum</th>
             <th style={styles.th}>Izvajalec ID</th>
           </tr>
+          
         </thead>
         <tbody>
           {mojeObravnave.map((obravnava) => (
@@ -352,6 +370,7 @@ const handleAddObravnava = async (e) => {
           ))}
         </tbody>
       </table>
+      
     )}
 
 
