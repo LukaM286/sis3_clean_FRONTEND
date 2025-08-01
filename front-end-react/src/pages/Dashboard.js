@@ -9,6 +9,10 @@ export default function Dashboard() {
   const [allUsers, setAllUsers] = useState([]);
   const [userId, setUserId] = useState(null);
 
+  const [mojKarton, setMojKarton] = useState(null);
+  const [kartonMsg, setKartonMsg] = useState("");
+
+
   const [formData, setFormData] = useState({
     id: "",
     username: "",
@@ -55,6 +59,22 @@ export default function Dashboard() {
       window.location.href = "/";
     }
   }, []);
+
+  useEffect(() => {
+  if (role === "pacient" && userId) {
+    fetch(`http://localhost:7555/users/karton/${userId}`, {
+      credentials: "include",
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          setMojKarton(data.karton);
+        }
+      })
+      .catch(() => console.log("Napaka pri pridobivanju kartona."));
+  }
+}, [role, userId]);
+
 
   useEffect(() => {
   if (role === "zdravnik") {
@@ -302,7 +322,7 @@ const handleAddObravnava = async (e) => {
           </>
         )}
 
-        {role === "pacient" && (
+        {role === "pacient" && mojKarton ? (
   <>
     <h2>Moje obravnave</h2>
     {mojeObravnave.length === 0 ? (
@@ -333,8 +353,61 @@ const handleAddObravnava = async (e) => {
         </tbody>
       </table>
     )}
+
+
+        <h2>Moj elektronski karton</h2>
+    <form
+      onSubmit={async (e) => {
+        e.preventDefault();
+        setKartonMsg("");
+        try {
+          const res = await fetch(`http://localhost:7555/users/karton/${userId}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify(mojKarton),
+          });
+          const result = await res.json();
+          if (result.success) {
+            setKartonMsg("✅ Karton uspešno posodobljen.");
+          } else {
+            setKartonMsg(result.message || "Napaka.");
+          }
+        } catch {
+          setKartonMsg("Napaka pri povezavi.");
+        }
+      }}
+    >
+      <label>Težave:</label>
+      <br />
+      <textarea
+        value={mojKarton.tezave || ""}
+        onChange={(e) => setMojKarton({ ...mojKarton, tezave: e.target.value })}
+      />
+      <br />
+
+      <label>Samomeritve:</label>
+      <br />
+      <textarea
+        value={mojKarton.samomeritve || ""}
+        onChange={(e) => setMojKarton({ ...mojKarton, samomeritve: e.target.value })}
+      />
+      <br />
+
+      <label>Zdravila:</label>
+      <br />
+      <textarea
+        value={mojKarton.zdravila || ""}
+        onChange={(e) => setMojKarton({ ...mojKarton, zdravila: e.target.value })}
+      />
+      <br />
+
+
+      <button type="submit" style={styles.button}>Shrani spremembe</button>
+    </form>
+    <p>{kartonMsg}</p>
   </>
-)}
+) : ( role === "pacient" && <p>Nalaganje kartona...</p>)}
 
         
 
