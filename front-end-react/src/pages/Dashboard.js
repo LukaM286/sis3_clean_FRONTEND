@@ -16,6 +16,23 @@ export default function Dashboard() {
     password: "",
   });
   const [message, setMessage] = useState("");
+  const [mojeObravnave, setMojeObravnave] = useState([]);
+
+  useEffect(() => {
+  if (role === "pacient" && userId) {
+    fetch(`http://localhost:7555/users/obravnava/${userId}`, {
+      credentials: "include",
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          setMojeObravnave(data.obravnave);
+        }
+      })
+      .catch(() => console.log("Napaka pri pridobivanju obravnav."));
+  }
+}, [role, userId]);
+
 
 
 
@@ -284,6 +301,41 @@ const handleAddObravnava = async (e) => {
           
           </>
         )}
+
+        {role === "pacient" && (
+  <>
+    <h2>Moje obravnave</h2>
+    {mojeObravnave.length === 0 ? (
+      <p>Ni najdenih obravnav.</p>
+    ) : (
+      <table style={{ width: "100%", borderCollapse: "collapse" }}>
+        <thead>
+          <tr>
+            <th style={styles.th}>ID</th>
+            <th style={styles.th}>Karton ID</th>
+            <th style={styles.th}>Tip</th>
+            <th style={styles.th}>Opis</th>
+            <th style={styles.th}>Datum</th>
+            <th style={styles.th}>Izvajalec ID</th>
+          </tr>
+        </thead>
+        <tbody>
+          {mojeObravnave.map((obravnava) => (
+            <tr key={obravnava.id}>
+              <td style={styles.td}>{obravnava.id}</td>
+              <td style={styles.td}>{obravnava.karton_id}</td>
+              <td style={styles.td}>{obravnava.tip_obravnave}</td>
+              <td style={styles.td}>{obravnava.opis}</td>
+              <td style={styles.td}>{obravnava.datum}</td>
+              <td style={styles.td}>{obravnava.izvajalec_id}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    )}
+  </>
+)}
+
         
 
         <button onClick={handleLogout} style={{ ...styles.button, background: "#e74c3c" }}>
