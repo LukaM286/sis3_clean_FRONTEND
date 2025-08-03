@@ -9,7 +9,12 @@ export default function Dashboard() {
   const [allUsers, setAllUsers] = useState([]);
   const [userId, setUserId] = useState(null);
 
+  const [ckzData, setCkzData] = useState([]);
+
+
   const [mojKarton, setMojKarton] = useState(null);
+  const [mojPoziv, setMojPoziv] = useState([]);
+
   const [kartonMsg, setKartonMsg] = useState("");
 
   const [obravnave, setObravnave] = useState([]);
@@ -55,6 +60,7 @@ export default function Dashboard() {
       .catch(() => setDiagnoze([]));
   };
 
+  
 
 
   
@@ -76,6 +82,23 @@ export default function Dashboard() {
       window.location.href = "/";
     }
   }, []);
+
+useEffect(() => {
+  if (role === "pacient" && userId) {
+    fetch("http://localhost:7555/users/poziv", {
+      method: "GET",
+      credentials: "include",
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          setMojPoziv(data.pozivi); 
+        }
+      })
+      .catch(() => console.log("Napaka pri pridobivanju pozivov."));
+  }
+}, [role, userId]);
+
 
   useEffect(() => {
   if (role === "pacient" && userId) {
@@ -107,6 +130,8 @@ export default function Dashboard() {
       .catch(() => console.log("Napaka pri pridobivanju pacientov."));
   }
 }, [role]);
+
+
 
 const [kartoni, setKartoni] = useState([]);
 
@@ -273,13 +298,19 @@ const handleAddObravnava = async (e) => {
   </tbody>
 </table>
 
+
+
+
 <h2 style={{ marginTop: "2rem" }}>Seznam elektronskih kartonov</h2>
 <table style={{ width: "100%", borderCollapse: "collapse" }}>
   <thead>
     <tr>
       <th style={styles.th}>Karton ID</th>
       <th style={styles.th}>Pacient ID</th>
-      <th style={styles.th}>Opis</th>
+      <th style={styles.th}>Tezave</th>
+      <th style={styles.th}>Samomeritve</th>
+      <th style={styles.th}>Zdravila</th>
+      
     </tr>
   </thead>
   <tbody>
@@ -287,10 +318,13 @@ const handleAddObravnava = async (e) => {
       <tr key={karton.id}>
         <td style={styles.td}>{karton.id}</td>
         <td style={styles.td}>{karton.pacient_id}</td>
-        <td style={styles.td}>{karton.opis || "-"}</td>
+        <td style={styles.td}>{karton.tezave || "-"}</td>
+        <td style={styles.td}>{karton.samomeritve || "-"}</td>
+         <td style={styles.td}>{karton.zdravila || "-"}</td>
       </tr>
     ))}
   </tbody>
+
 </table>
 <br></br>
 <form onSubmit={handleAddObravnava}>
@@ -327,10 +361,13 @@ const handleAddObravnava = async (e) => {
   <button type="submit">Dodaj obravnavo</button>
 </form>
 
+
+
+
 <p style={{ marginTop: "1rem", fontWeight: "bold" }}>{obravnavaMsg}</p>
 
 
-
+    
 
 
           
@@ -370,8 +407,50 @@ const handleAddObravnava = async (e) => {
           ))}
         </tbody>
       </table>
+
+
+
       
     )}
+
+    <h2>Moji Pozivi</h2>
+    {mojPoziv.length === 0 ? (
+      <p>Ni najdenih pozivov.</p>
+    ) : (
+      <table style={{ width: "100%", borderCollapse: "collapse" }}>
+        <thead>
+          <tr>
+            <th style={styles.th}>ID</th>
+            <th style={styles.th}>Prejemnik_ID</th>
+            <th style={styles.th}>Izdajatelj_ID</th>
+            <th style={styles.th}>Datum</th>
+            <th style={styles.th}>Razlog</th>
+            
+          </tr>
+          
+        </thead>
+        <tbody>
+          {mojPoziv.map((poziv) => (
+            <tr key={poziv.id}>
+              <td style={styles.td}>{poziv.id}</td>
+              <td style={styles.td}>{poziv.prejemnik_id}</td>
+              <td style={styles.td}>{poziv.izdajatelj_id}</td>
+              <td style={styles.td}>{poziv.datum}</td>
+              <td style={styles.td}>{poziv.razlog}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
+
+
+      
+    )}
+
+
+
+
+    
 
 
         <h2>Moj elektronski karton</h2>
@@ -425,6 +504,13 @@ const handleAddObravnava = async (e) => {
       <button type="submit" style={styles.button}>Shrani spremembe</button>
     </form>
     <p>{kartonMsg}</p>
+
+
+
+
+
+
+
   </>
 ) : ( role === "pacient" && <p>Nalaganje kartona...</p>)}
 
@@ -459,7 +545,7 @@ const styles = {
     borderRadius: "12px",
     boxShadow: "0 4px 20px rgba(0, 0, 0, 0.2)",
     width: "100%",
-    maxWidth: "900px",  // povišana širina da se bolje prilagodi tabeli
+    maxWidth: "900px",  
     marginBottom: "2rem",
   },
   button: {
@@ -472,7 +558,7 @@ const styles = {
     fontWeight: "bold",
   },
   tableContainer: {
-    width: "100%", // naj bo polna širina boxa
+    width: "100%", 
     overflowX: "auto",
     marginBottom: "2rem",
     background: "#fff",
@@ -482,7 +568,7 @@ const styles = {
   table: {
     width: "100%",
     borderCollapse: "collapse",
-    minWidth: "800px",  // večja minimalna širina za tabelo
+    minWidth: "800px",  
   },
   th: {
     textAlign: "left",
@@ -491,12 +577,12 @@ const styles = {
     backgroundColor: "#e8f0fe",
     color: "#2575fc",
     fontWeight: "600",
-    whiteSpace: "nowrap",  // prepreči lomljenje besed v glavi
+    whiteSpace: "nowrap",  
   },
   td: {
     padding: "12px 16px",
     borderBottom: "1px solid #ddd",
-    whiteSpace: "nowrap", // prepreči lomljenje besed v celicah
+    whiteSpace: "nowrap", 
   },
   trHover: {
     transition: "background-color 0.2s ease",
