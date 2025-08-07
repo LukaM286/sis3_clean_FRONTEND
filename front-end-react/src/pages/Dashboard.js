@@ -37,49 +37,49 @@ export default function Dashboard() {
     opombe: ""
   });
 
-  
-const handleAddDosezek = async (e) => {
-  e.preventDefault();
-  setMessage("");
-  
-  console.log("Podatki:", formData2);  
-  
-  try {
-    const response = await fetch("http://localhost:7555/users/new/dosezek", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify(formData),
-    });
 
-    const result = await response.json();
+  const handleAddDosezek = async (e) => {
+    e.preventDefault();
+    setMessage("");
 
-    if (result.success) {
-      setMessage("✅ Dosežek uspešno dodan.");
-      setFormData2({ id: "", obravnava_id: "", cilji_dosezeni: "", opombe: "" });
-    } else {
-      setMessage(result.message || "Napaka pri dodajanju dosezka.");
-    }
-  } catch (error) {
-    setMessage("Napaka pri povezavi s strežnikom.");
-  }
-};
+    console.log("Podatki:", formData2);
 
-useEffect(() => {
-  fetch("http://localhost:7555/users/obravnave", { credentials: "include" })
-    .then(res => res.json())
-    .then(data => {
-      if(data.success) {
-        setObravnave2(data.obravnave);
+    try {
+      const response = await fetch("http://localhost:7555/users/new/dosezek", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(formData),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setMessage("✅ Dosežek uspešno dodan.");
+        setFormData2({ id: "", obravnava_id: "", cilji_dosezeni: "", opombe: "" });
       } else {
-        console.error("Napaka pri pridobivanju obravnav:", data.message);
+        setMessage(result.message || "Napaka pri dodajanju dosezka.");
       }
-    })
-    .catch(err => console.error("Napaka pri povezavi:", err));
-}, []);
+    } catch (error) {
+      setMessage("Napaka pri povezavi s strežnikom.");
+    }
+  };
+
+  useEffect(() => {
+    fetch("http://localhost:7555/users/obravnave", { credentials: "include" })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          setObravnave2(data.obravnave);
+        } else {
+          console.error("Napaka pri pridobivanju obravnav:", data.message);
+        }
+      })
+      .catch(err => console.error("Napaka pri povezavi:", err));
+  }, []);
 
 
-  
+
 
   const [formData, setFormData] = useState({
     id: "",
@@ -91,19 +91,19 @@ useEffect(() => {
   const [mojeObravnave, setMojeObravnave] = useState([]);
 
   useEffect(() => {
-  if (role === "pacient" && userId) {
-    fetch(`http://localhost:7555/users/obravnava/${userId}`, {
-      credentials: "include",
-    })
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) {
-          setMojeObravnave(data.obravnave);
-        }
+    if (role === "pacient" && userId) {
+      fetch(`http://localhost:7555/users/obravnava/${userId}`, {
+        credentials: "include",
       })
-      .catch(() => console.log("Napaka pri pridobivanju obravnav."));
-  }
-}, [role, userId]);
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            setMojeObravnave(data.obravnave);
+          }
+        })
+        .catch(() => console.log("Napaka pri pridobivanju obravnav."));
+    }
+  }, [role, userId]);
 
   const handleShowDiagnoze = (obravnavaId) => {
     fetch(`/users/obravnava/${obravnavaId}/diagnoze`)
@@ -119,10 +119,10 @@ useEffect(() => {
       .catch(() => setDiagnoze([]));
   };
 
-  
 
 
-  
+
+
 
   useEffect(() => {
     const savedName = localStorage.getItem("name");
@@ -131,7 +131,7 @@ useEffect(() => {
     const storedId = localStorage.getItem("userId");
     setUserId(storedId);
 
-    
+
 
     if (savedName && savedRole && savedVlogaId) {
       setName(savedName);
@@ -142,123 +142,123 @@ useEffect(() => {
     }
   }, []);
 
-useEffect(() => {
-  if (role === "pacient" && userId) {
-    fetch("http://localhost:7555/users/poziv", {
-      method: "GET",
-      credentials: "include",
-    })
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) {
-          setMojPoziv(data.pozivi); 
-        }
-      })
-      .catch(() => console.log("Napaka pri pridobivanju pozivov."));
-  }
-}, [role, userId]);
-
-
   useEffect(() => {
-  if (role === "pacient" && userId) {
-    fetch(`http://localhost:7555/users/karton/${userId}`, {
-      credentials: "include",
-    })
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) {
-          setMojKarton(data.karton);
-        }
+    if (role === "pacient" && userId) {
+      fetch("http://localhost:7555/users/poziv", {
+        method: "GET",
+        credentials: "include",
       })
-      .catch(() => console.log("Napaka pri pridobivanju kartona."));
-  }
-}, [role, userId]);
-
-
-  useEffect(() => {
-  if (role === "zdravnik" || role === "med-sestra") {
-    fetch("http://localhost:7555/users/list", {
-      credentials: "include",
-    })
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) {
-          setAllUsers(data.users);
-        }
-      })
-      .catch(() => console.log("Napaka pri pridobivanju pacientov."));
-  }
-}, [role]);
-
-
-
-const [kartoni, setKartoni] = useState([]);
-
-useEffect(() => {
-  if (role === "zdravnik" || role === "med-sestra") {
-    fetch("http://localhost:7555/users/kartoni", {
-      credentials: "include",
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.success) {
-          setKartoni(data.kartoni);
-        }
-      })
-      .catch(() => console.log("Napaka pri pridobivanju kartonov."));
-  }
-}, [role]);
-
-const [novaObravnava, setNovaObravnava] = useState({
-  id: "",
-  karton_id: "",
-  tip_obravnave: "",
-  opis: "",
-  datum: "",
-  izvajalec_id: "",
-  pacient_id: ""
-});
-
-const [obravnavaMsg, setObravnavaMsg] = useState("");
-
-
-const handleAddObravnava = async (e) => {
-  e.preventDefault();
-  setObravnavaMsg("");
-
-  try {
-    const res = await fetch("http://localhost:7555/users/addObravnava", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify(novaObravnava)
-    });
-
-    const result = await res.json();
-
-    if (result.success) {
-      setObravnavaMsg("Obravnava uspešno dodana.");
-      setNovaObravnava({
-        id: "",
-        karton_id: "",
-        tip_obravnave: "",
-        opis: "",
-        datum: "",
-        izvajalec_id: "",
-        pacient_id: ""
-      });
-    } else {
-      setObravnavaMsg(result.message || "Napaka.");
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            setMojPoziv(data.pozivi);
+          }
+        })
+        .catch(() => console.log("Napaka pri pridobivanju pozivov."));
     }
-  } catch {
-    setObravnavaMsg("Napaka pri povezavi.");
-  }
-};
+  }, [role, userId]);
+
+
+  useEffect(() => {
+    if (role === "pacient" && userId) {
+      fetch(`http://localhost:7555/users/karton/${userId}`, {
+        credentials: "include",
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            setMojKarton(data.karton);
+          }
+        })
+        .catch(() => console.log("Napaka pri pridobivanju kartona."));
+    }
+  }, [role, userId]);
+
+
+  useEffect(() => {
+    if (role === "zdravnik" || role === "med-sestra") {
+      fetch("http://localhost:7555/users/list", {
+        credentials: "include",
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            setAllUsers(data.users);
+          }
+        })
+        .catch(() => console.log("Napaka pri pridobivanju pacientov."));
+    }
+  }, [role]);
+
+
+
+  const [kartoni, setKartoni] = useState([]);
+
+  useEffect(() => {
+    if (role === "zdravnik" || role === "med-sestra") {
+      fetch("http://localhost:7555/users/kartoni", {
+        credentials: "include",
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.success) {
+            setKartoni(data.kartoni);
+          }
+        })
+        .catch(() => console.log("Napaka pri pridobivanju kartonov."));
+    }
+  }, [role]);
+
+  const [novaObravnava, setNovaObravnava] = useState({
+    id: "",
+    karton_id: "",
+    tip_obravnave: "",
+    opis: "",
+    datum: "",
+    izvajalec_id: "",
+    pacient_id: ""
+  });
+
+  const [obravnavaMsg, setObravnavaMsg] = useState("");
+
+
+  const handleAddObravnava = async (e) => {
+    e.preventDefault();
+    setObravnavaMsg("");
+
+    try {
+      const res = await fetch("http://localhost:7555/users/addObravnava", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(novaObravnava)
+      });
+
+      const result = await res.json();
+
+      if (result.success) {
+        setObravnavaMsg("Obravnava uspešno dodana.");
+        setNovaObravnava({
+          id: "",
+          karton_id: "",
+          tip_obravnave: "",
+          opis: "",
+          datum: "",
+          izvajalec_id: "",
+          pacient_id: ""
+        });
+      } else {
+        setObravnavaMsg(result.message || "Napaka.");
+      }
+    } catch {
+      setObravnavaMsg("Napaka pri povezavi.");
+    }
+  };
 
 
 
 
-  
+
 
   const handleLogout = () => {
     localStorage.clear();
@@ -294,7 +294,7 @@ const handleAddObravnava = async (e) => {
       setMessage("Napaka pri povezavi s strežnikom.");
     }
   };
-  
+
 
   return (
     <div style={styles.container}>
@@ -303,128 +303,128 @@ const handleAddObravnava = async (e) => {
         <p>Vloga: {role}</p>
         <p>ID: {userId}</p>
 
-      {role === "med-sestra" && (
-          <> 
-          <h2 style={{ marginTop: "2rem" }}>Seznam pacientov</h2>
-          <table style={{ width: "100%", borderCollapse: "collapse" }}>
-            <thead>
-              <tr>
-                <th style={styles.th}>ID</th>
-                <th style={styles.th}>Ime</th>
-                <th style={styles.th}>Priimek</th>
-                <th style={styles.th}>Email</th>
-                <th style={styles.th}>Vloga</th>
-              </tr>
-            </thead>
-            <tbody>
-              {allUsers.map((user) => (
-                <tr key={user.id}>
-                  <td style={styles.td}>{user.id}</td>
-                  <td style={styles.td}>{user.ime}</td>
-                  <td style={styles.td}>{user.priimek}</td>
-                  <td style={styles.td}>{user.email}</td>
-                  <td style={styles.td}>{user.vloga_id}</td>
+        {role === "med-sestra" && (
+          <>
+            <h2 style={{ marginTop: "2rem" }}>Seznam pacientov</h2>
+            <table style={{ width: "100%", borderCollapse: "collapse" }}>
+              <thead>
+                <tr>
+                  <th style={styles.th}>ID</th>
+                  <th style={styles.th}>Ime</th>
+                  <th style={styles.th}>Priimek</th>
+                  <th style={styles.th}>Email</th>
+                  <th style={styles.th}>Vloga</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-<br></br>
-          <h2 style={{ marginTop: "2rem" }}>Seznam elektronskih kartonov</h2>
-          <table style={{ width: "100%", borderCollapse: "collapse" }}>
-            <thead>
-              <tr>
-                <th style={styles.th}>Karton ID</th>
-                <th style={styles.th}>Pacient ID</th>
-                <th style={styles.th}>Tezave</th>
-                <th style={styles.th}>Samomeritve</th>
-                <th style={styles.th}>Zdravila</th>
-                
-              </tr>
-            </thead>
-            <tbody>
-              {kartoni.map((karton) => (
-                <tr key={karton.id}>
-                  <td style={styles.td}>{karton.id}</td>
-                  <td style={styles.td}>{karton.pacient_id}</td>
-                  <td style={styles.td}>{karton.tezave || "-"}</td>
-                  <td style={styles.td}>{karton.samomeritve || "-"}</td>
-                  <td style={styles.td}>{karton.zdravila || "-"}</td>
-                </tr>
-              ))}
-            </tbody>
+              </thead>
+              <tbody>
+                {allUsers.map((user) => (
+                  <tr key={user.id}>
+                    <td style={styles.td}>{user.id}</td>
+                    <td style={styles.td}>{user.ime}</td>
+                    <td style={styles.td}>{user.priimek}</td>
+                    <td style={styles.td}>{user.email}</td>
+                    <td style={styles.td}>{user.vloga_id}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <br></br>
+            <h2 style={{ marginTop: "2rem" }}>Seznam elektronskih kartonov</h2>
+            <table style={{ width: "100%", borderCollapse: "collapse" }}>
+              <thead>
+                <tr>
+                  <th style={styles.th}>Karton ID</th>
+                  <th style={styles.th}>Pacient ID</th>
+                  <th style={styles.th}>Tezave</th>
+                  <th style={styles.th}>Samomeritve</th>
+                  <th style={styles.th}>Zdravila</th>
 
-          </table>
-          <br></br>
-                         </>
+                </tr>
+              </thead>
+              <tbody>
+                {kartoni.map((karton) => (
+                  <tr key={karton.id}>
+                    <td style={styles.td}>{karton.id}</td>
+                    <td style={styles.td}>{karton.pacient_id}</td>
+                    <td style={styles.td}>{karton.tezave || "-"}</td>
+                    <td style={styles.td}>{karton.samomeritve || "-"}</td>
+                    <td style={styles.td}>{karton.zdravila || "-"}</td>
+                  </tr>
+                ))}
+              </tbody>
+
+            </table>
+            <br></br>
+          </>
         )}
 
 
         {role === "CKZ" && (
-          <> 
-              <div>
-      <h2>Seznam obravnav</h2>
-      <table style={{ width: "100%", borderCollapse: "collapse", tableLayout: "auto" }}>
-        <thead>
-          <tr>
-            <th style={{...styles.th, color: "red"}}>ID</th>
-            <th style={styles.th}>karton_id</th>
-            <th style={styles.th}>tip_obravnave</th>
-            <th style={styles.th}>opis</th>
-            <th style={styles.th}>datum</th>
-            <th style={styles.th}>izvajalec_id</th>
-            <th style={styles.th}>pacient_id</th>
-            
-          </tr>
-        </thead>
-        <tbody>
-          {obravnave2.map((o) => (
-            <tr key={o.id}>
-              <td style={{...styles.td, color: "red"}}>{o.id}</td>
-              <td style={styles.td}>{o.karton_id}</td>
-              <td style={styles.td}>{o.tip_obravnave}</td>
-              <td style={styles.td}>{o.opis}</td>
-              <td style={styles.td}>{o.datum}</td>
-              <td style={styles.td}>{o.izvajalec_id}</td>
-              <td style={styles.td}>{o.pacient_id}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  
+          <>
+            <div>
+              <h2>Seznam obravnav</h2>
+              <table style={{ width: "100%", borderCollapse: "collapse", tableLayout: "auto" }}>
+                <thead>
+                  <tr>
+                    <th style={{ ...styles.th, color: "red" }}>ID</th>
+                    <th style={styles.th}>karton_id</th>
+                    <th style={styles.th}>tip_obravnave</th>
+                    <th style={styles.th}>opis</th>
+                    <th style={styles.th}>datum</th>
+                    <th style={styles.th}>izvajalec_id</th>
+                    <th style={styles.th}>pacient_id</th>
+
+                  </tr>
+                </thead>
+                <tbody>
+                  {obravnave2.map((o) => (
+                    <tr key={o.id}>
+                      <td style={{ ...styles.td, color: "red" }}>{o.id}</td>
+                      <td style={styles.td}>{o.karton_id}</td>
+                      <td style={styles.td}>{o.tip_obravnave}</td>
+                      <td style={styles.td}>{o.opis}</td>
+                      <td style={styles.td}>{o.datum}</td>
+                      <td style={styles.td}>{o.izvajalec_id}</td>
+                      <td style={styles.td}>{o.pacient_id}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
 
 
-<h2>Dodaj nov dosežek</h2>
-<form onSubmit={handleAddDosezek} style={{ textAlign: "left" }}>
-  <label >ID:</label><br />
-  <input name="id" value={formData.id} onChange={handleInputChange} required />
-  <br /><br />
-  <label style={{color: "red"}}>Obravnava ID:</label><br />
-  <input name="obravnava_id" value={formData.obravnava_id} onChange={handleInputChange} required />
-  <br /><br />
-  <label>Cilji doseženi:</label><br />
-  <input name="cilji_dosezeni" value={formData.cilji_dosezeni} onChange={handleInputChange} required />
-  <br /><br />
-  <label>Opombe:</label><br />
-  <input name="opombe" value={formData.opombe} onChange={handleInputChange} />
-  <br /><br />
-  <button type="submit" style={{ marginTop: "1rem" }}>
-    Dodaj dosežek
-  </button>
-</form>
-<p style={{ marginTop: "1rem", fontWeight: "bold" }}>{message}</p>
+
+            <h2>Dodaj nov dosežek</h2>
+            <form onSubmit={handleAddDosezek} style={{ textAlign: "left" }}>
+              <label >ID:</label><br />
+              <input name="id" value={formData.id} onChange={handleInputChange} required />
+              <br /><br />
+              <label style={{ color: "red" }}>Obravnava ID:</label><br />
+              <input name="obravnava_id" value={formData.obravnava_id} onChange={handleInputChange} required />
+              <br /><br />
+              <label>Cilji doseženi:</label><br />
+              <input name="cilji_dosezeni" value={formData.cilji_dosezeni} onChange={handleInputChange} required />
+              <br /><br />
+              <label>Opombe:</label><br />
+              <input name="opombe" value={formData.opombe} onChange={handleInputChange} />
+              <br /><br />
+              <button type="submit" style={{ marginTop: "1rem" }}>
+                Dodaj dosežek
+              </button>
+            </form>
+            <p style={{ marginTop: "1rem", fontWeight: "bold" }}>{message}</p>
 
 
- 
 
-                 </>
+
+          </>
         )}
 
         {role === "zdravnik" && (
           <>
             <h2>Dodaj novega pacienta</h2>
             <form onSubmit={handleAddPatient} style={{ textAlign: "left" }}>
-              
+
               <label>ID:</label>
               <br></br>
               <input name="id" value={formData.id} onChange={handleInputChange} required />
@@ -444,326 +444,268 @@ const handleAddObravnava = async (e) => {
               <br></br>
               <input name="password" type="password" value={formData.password} onChange={handleInputChange} required />
               <br></br>
-              
+
               <button type="submit" style={{ ...styles.button, marginTop: "1rem" }}>
                 Dodaj pacienta
               </button>
             </form>
             <p style={{ marginTop: "1rem", fontWeight: "bold" }}>{message}</p>
-          
-<h2 style={{ marginTop: "2rem" }}>Seznam pacientov</h2>
-<table style={{ width: "100%", borderCollapse: "collapse" }}>
-  <thead>
-    <tr>
-      <th style={styles.th}>ID</th>
-      <th style={styles.th}>Ime</th>
-      <th style={styles.th}>Priimek</th>
-      <th style={styles.th}>Email</th>
-      <th style={styles.th}>Vloga</th>
-    </tr>
-  </thead>
-  <tbody>
-    {allUsers.map((user) => (
-      <tr key={user.id}>
-        <td style={styles.td}>{user.id}</td>
-        <td style={styles.td}>{user.ime}</td>
-        <td style={styles.td}>{user.priimek}</td>
-        <td style={styles.td}>{user.email}</td>
-        <td style={styles.td}>{user.vloga_id}</td>
-      </tr>
-    ))}
-  </tbody>
-</table>
+
+            <h2 style={{ marginTop: "2rem" }}>Seznam pacientov</h2>
+            <table style={{ width: "100%", borderCollapse: "collapse" }}>
+              <thead>
+                <tr>
+                  <th style={styles.th}>ID</th>
+                  <th style={styles.th}>Ime</th>
+                  <th style={styles.th}>Priimek</th>
+                  <th style={styles.th}>Email</th>
+                  <th style={styles.th}>Vloga</th>
+                </tr>
+              </thead>
+              <tbody>
+                {allUsers.map((user) => (
+                  <tr key={user.id}>
+                    <td style={styles.td}>{user.id}</td>
+                    <td style={styles.td}>{user.ime}</td>
+                    <td style={styles.td}>{user.priimek}</td>
+                    <td style={styles.td}>{user.email}</td>
+                    <td style={styles.td}>{user.vloga_id}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
 
 
 
 
-<h2 style={{ marginTop: "2rem" }}>Seznam elektronskih kartonov</h2>
-<table style={{ width: "100%", borderCollapse: "collapse" }}>
-  <thead>
-    <tr>
-      <th style={styles.th}>Karton ID</th>
-      <th style={styles.th}>Pacient ID</th>
-      <th style={styles.th}>Tezave</th>
-      <th style={styles.th}>Samomeritve</th>
-      <th style={styles.th}>Zdravila</th>
-      
-    </tr>
-  </thead>
-  <tbody>
-    {kartoni.map((karton) => (
-      <tr key={karton.id}>
-        <td style={styles.td}>{karton.id}</td>
-        <td style={styles.td}>{karton.pacient_id}</td>
-        <td style={styles.td}>{karton.tezave || "-"}</td>
-        <td style={styles.td}>{karton.samomeritve || "-"}</td>
-         <td style={styles.td}>{karton.zdravila || "-"}</td>
-      </tr>
-    ))}
-  </tbody>
+            <h2 style={{ marginTop: "2rem" }}>Seznam elektronskih kartonov</h2>
+            <table style={{ width: "100%", borderCollapse: "collapse" }}>
+              <thead>
+                <tr>
+                  <th style={styles.th}>Karton ID</th>
+                  <th style={styles.th}>Pacient ID</th>
+                  <th style={styles.th}>Tezave</th>
+                  <th style={styles.th}>Samomeritve</th>
+                  <th style={styles.th}>Zdravila</th>
 
-</table>
-<br></br>
+                </tr>
+              </thead>
+              <tbody>
+                {kartoni.map((karton) => (
+                  <tr key={karton.id}>
+                    <td style={styles.td}>{karton.id}</td>
+                    <td style={styles.td}>{karton.pacient_id}</td>
+                    <td style={styles.td}>{karton.tezave || "-"}</td>
+                    <td style={styles.td}>{karton.samomeritve || "-"}</td>
+                    <td style={styles.td}>{karton.zdravila || "-"}</td>
+                  </tr>
+                ))}
+              </tbody>
 
-<h3 style={{ marginTop: "2rem" }}>Izbriši karton po ID-ju</h3>
-<form
-  onSubmit={async (e) => {
-    e.preventDefault();
-    setDeleteKartonMsg("");
+            </table>
+            <br></br>
 
-    try {
-      const res = await fetch("http://localhost:7555/users/kartoni/delete", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ id: deleteKartonId }),
-      });
+            <h3 style={{ marginTop: "2rem" }}>Izbriši karton po ID-ju</h3>
+            <form
+              onSubmit={async (e) => {
+                e.preventDefault();
+                setDeleteKartonMsg("");
 
-      const result = await res.json();
+                try {
+                  const res = await fetch("http://localhost:7555/users/kartoni/delete", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    credentials: "include",
+                    body: JSON.stringify({ id: deleteKartonId }),
+                  });
 
-      if (result.success) {
-        setDeleteKartonMsg("✅ Karton uspešno izbrisan.");
-        setDeleteKartonId("");
+                  const result = await res.json();
 
-        const refresh = await fetch("http://localhost:7555/users/kartoni", {
-          credentials: "include",
-        });
-        const data = await refresh.json();
-        if (data.success) setKartoni(data.kartoni);
-      } else {
-        setDeleteKartonMsg(result.message || "Napaka.");
-      }
-    } catch {
-      setDeleteKartonMsg("Napaka pri povezavi s strežnikom.");
-    }
-  }}
->
-  <label>ID kartona za izbris:</label>
-  <br />
-  <input
-    type="number"
-    required
-    value={deleteKartonId}
-    onChange={(e) => setDeleteKartonId(e.target.value)}
-  />
-  <br />
-  <button type="submit" style={{ ...styles.button, marginTop: "1rem", background: "#e74c3c" }}>
-    Izbriši karton
-  </button>
-</form>
-<p style={{ fontWeight: "bold", color: deleteKartonMsg.includes("✅") ? "green" : "red" }}>
-  {deleteKartonMsg}
-</p>
+                  if (result.success) {
+                    setDeleteKartonMsg("✅ Karton uspešno izbrisan.");
+                    setDeleteKartonId("");
 
-<br></br>
-<h2>Seznam obravnav</h2>
-      <table style={{ width: "auto", borderCollapse: "collapse", tableLayout: "auto" }}>
-        <thead>
-          <tr>
-            <th style={{...styles.th, color: "red"}}>ID</th>
-            <th style={styles.th}>karton_id</th>
-            <th style={styles.th}>tip_obravnave</th>
-            <th style={styles.th}>opis</th>
-            <th style={styles.th}>datum</th>
-            <th style={styles.th}>izvajalec_id</th>
-            <th style={styles.th}>pacient_id</th>
-            
-          </tr>
-        </thead>
-        <tbody>
-          {obravnave2.map((o) => (
-            <tr key={o.id}>
-              <td style={{...styles.td, color: "red"}}>{o.id}</td>
-              <td style={styles.td}>{o.karton_id}</td>
-              <td style={styles.td}>{o.tip_obravnave}</td>
-              <td style={styles.td}>{o.opis}</td>
-              <td style={styles.td}>{o.datum}</td>
-              <td style={styles.td}>{o.izvajalec_id}</td>
-              <td style={styles.td}>{o.pacient_id}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    
+                    const refresh = await fetch("http://localhost:7555/users/kartoni", {
+                      credentials: "include",
+                    });
+                    const data = await refresh.json();
+                    if (data.success) setKartoni(data.kartoni);
+                  } else {
+                    setDeleteKartonMsg(result.message || "Napaka.");
+                  }
+                } catch {
+                  setDeleteKartonMsg("Napaka pri povezavi s strežnikom.");
+                }
+              }}
+            >
+              <label>ID kartona za izbris:</label>
+              <br />
+              <input
+                type="number"
+                required
+                value={deleteKartonId}
+                onChange={(e) => setDeleteKartonId(e.target.value)}
+              />
+              <br />
+              <button type="submit" style={{ ...styles.button, marginTop: "1rem", background: "#e74c3c" }}>
+                Izbriši karton
+              </button>
+            </form>
+            <p style={{ fontWeight: "bold", color: deleteKartonMsg.includes("✅") ? "green" : "red" }}>
+              {deleteKartonMsg}
+            </p>
 
-<br></br>
-<form onSubmit={handleAddObravnava}>
-  <br></br>
-  <label>ID obravnave:</label>
-  <br></br>
-  <input required value={novaObravnava.id} onChange={e => setNovaObravnava({ ...novaObravnava, id: e.target.value })} />
-<br></br>
-  <label>ID kartona (Elektronski Karton):</label>
-  <br></br>
-  <input required value={novaObravnava.karton_id} onChange={e => setNovaObravnava({ ...novaObravnava, karton_id: e.target.value })} />
-<br></br>
-  <label>Tip obravnave:</label>
-  <br></br>
-  <input required value={novaObravnava.tip_obravnave} onChange={e => setNovaObravnava({ ...novaObravnava, tip_obravnave: e.target.value })} />
-<br></br>
-  <label>Opis:</label>
-  <br></br>
-  <textarea required rows="4" value={novaObravnava.opis} onChange={e => setNovaObravnava({ ...novaObravnava, opis: e.target.value })}></textarea>
-<br></br>
-  <label>Datum:</label>
-  <br></br>
-  <input type="date" required value={novaObravnava.datum} onChange={e => setNovaObravnava({ ...novaObravnava, datum: e.target.value })} />
-    <br></br>
-  <label>Vaš ID izvajalca (zdravnika):</label>
-  <br></br>
-  <input required value={novaObravnava.izvajalec_id} onChange={e => setNovaObravnava({ ...novaObravnava, izvajalec_id: e.target.value })} />
-<br></br>
-  <label>ID pacienta (Tabela Pacientov):</label>
-  <br></br>
-  <input required value={novaObravnava.pacient_id} onChange={e => setNovaObravnava({ ...novaObravnava, pacient_id: e.target.value })} />
-<br></br>
-<br></br>
-  <button type="submit">Dodaj obravnavo</button>
-</form>
+            <br></br>
+            <h2>Seznam obravnav</h2>
+            <table style={{ width: "auto", borderCollapse: "collapse", tableLayout: "auto" }}>
+              <thead>
+                <tr>
+                  <th style={{ ...styles.th, color: "red" }}>ID</th>
+                  <th style={styles.th}>karton_id</th>
+                  <th style={styles.th}>tip_obravnave</th>
+                  <th style={styles.th}>opis</th>
+                  <th style={styles.th}>datum</th>
+                  <th style={styles.th}>izvajalec_id</th>
+                  <th style={styles.th}>pacient_id</th>
+
+                </tr>
+              </thead>
+              <tbody>
+                {obravnave2.map((o) => (
+                  <tr key={o.id}>
+                    <td style={{ ...styles.td, color: "red" }}>{o.id}</td>
+                    <td style={styles.td}>{o.karton_id}</td>
+                    <td style={styles.td}>{o.tip_obravnave}</td>
+                    <td style={styles.td}>{o.opis}</td>
+                    <td style={styles.td}>{o.datum}</td>
+                    <td style={styles.td}>{o.izvajalec_id}</td>
+                    <td style={styles.td}>{o.pacient_id}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
 
 
+            <br></br>
+            <form onSubmit={handleAddObravnava}>
+              <br></br>
+              <label>ID obravnave:</label>
+              <br></br>
+              <input required value={novaObravnava.id} onChange={e => setNovaObravnava({ ...novaObravnava, id: e.target.value })} />
+              <br></br>
+              <label>ID kartona (Elektronski Karton):</label>
+              <br></br>
+              <input required value={novaObravnava.karton_id} onChange={e => setNovaObravnava({ ...novaObravnava, karton_id: e.target.value })} />
+              <br></br>
+              <label>Tip obravnave:</label>
+              <br></br>
+              <input required value={novaObravnava.tip_obravnave} onChange={e => setNovaObravnava({ ...novaObravnava, tip_obravnave: e.target.value })} />
+              <br></br>
+              <label>Opis:</label>
+              <br></br>
+              <textarea required rows="4" value={novaObravnava.opis} onChange={e => setNovaObravnava({ ...novaObravnava, opis: e.target.value })}></textarea>
+              <br></br>
+              <label>Datum:</label>
+              <br></br>
+              <input type="date" required value={novaObravnava.datum} onChange={e => setNovaObravnava({ ...novaObravnava, datum: e.target.value })} />
+              <br></br>
+              <label>Vaš ID izvajalca (zdravnika):</label>
+              <br></br>
+              <input required value={novaObravnava.izvajalec_id} onChange={e => setNovaObravnava({ ...novaObravnava, izvajalec_id: e.target.value })} />
+              <br></br>
+              <label>ID pacienta (Tabela Pacientov):</label>
+              <br></br>
+              <input required value={novaObravnava.pacient_id} onChange={e => setNovaObravnava({ ...novaObravnava, pacient_id: e.target.value })} />
+              <br></br>
+              <br></br>
+              <button type="submit">Dodaj obravnavo</button>
+            </form>
 
 
-<p style={{ marginTop: "1rem", fontWeight: "bold" }}>{obravnavaMsg}</p>
 
 
-    
+            <p style={{ marginTop: "1rem", fontWeight: "bold" }}>{obravnavaMsg}</p>
 
 
-          
-          
-          
+
+
+
+
+
+
           </>
         )}
 
         {role === "pacient" && mojKarton ? (
-  <>
-    <h2>Moje obravnave</h2>
-    {mojeObravnave.length === 0 ? (
-      <p>Ni najdenih obravnav.</p>
-    ) : (
-      <table style={{ width: "100%", borderCollapse: "collapse" }}>
-        <thead>
-          <tr>
-            <th style={styles.th}>ID</th>
-            <th style={styles.th}>Karton ID</th>
-            <th style={styles.th}>Tip</th>
-            <th style={styles.th}>Opis</th>
-            <th style={styles.th}>Datum</th>
-            <th style={styles.th}>Izvajalec ID</th>
-          </tr>
-          
-        </thead>
-        <tbody>
-          {mojeObravnave.map((obravnava) => (
-            <tr key={obravnava.id}>
-              <td style={styles.td}>{obravnava.id}</td>
-              <td style={styles.td}>{obravnava.karton_id}</td>
-              <td style={styles.td}>{obravnava.tip_obravnave}</td>
-              <td style={styles.td}>{obravnava.opis}</td>
-              <td style={styles.td}>{obravnava.datum}</td>
-              <td style={styles.td}>{obravnava.izvajalec_id}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+          <>
+            <h2>Moje obravnave</h2>
+            {mojeObravnave.length === 0 ? (
+              <p>Ni najdenih obravnav.</p>
+            ) : (
+              <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                <thead>
+                  <tr>
+                    <th style={styles.th}>ID</th>
+                    <th style={styles.th}>Karton ID</th>
+                    <th style={styles.th}>Tip</th>
+                    <th style={styles.th}>Opis</th>
+                    <th style={styles.th}>Datum</th>
+                    <th style={styles.th}>Izvajalec ID</th>
+                  </tr>
 
-
-
-      
-    )}
-
-    <h2>Moji Pozivi</h2>
-    {mojPoziv.length === 0 ? (
-      <p>Ni najdenih pozivov.</p>
-    ) : (
-      <table style={{ width: "100%", borderCollapse: "collapse" }}>
-        <thead>
-          <tr>
-            <th style={styles.th}>ID</th>
-            <th style={styles.th}>Prejemnik_ID</th>
-            <th style={styles.th}>Izdajatelj_ID</th>
-            <th style={styles.th}>Datum</th>
-            <th style={styles.th}>Razlog</th>
-            
-          </tr>
-          
-        </thead>
-        <tbody>
-          {mojPoziv.map((poziv) => (
-            <tr key={poziv.id}>
-              <td style={styles.td}>{poziv.id}</td>
-              <td style={styles.td}>{poziv.prejemnik_id}</td>
-              <td style={styles.td}>{poziv.izdajatelj_id}</td>
-              <td style={styles.td}>{poziv.datum}</td>
-              <td style={styles.td}>{poziv.razlog}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-
-
-
-      
-    )}
+                </thead>
+                <tbody>
+                  {mojeObravnave.map((obravnava) => (
+                    <tr key={obravnava.id}>
+                      <td style={styles.td}>{obravnava.id}</td>
+                      <td style={styles.td}>{obravnava.karton_id}</td>
+                      <td style={styles.td}>{obravnava.tip_obravnave}</td>
+                      <td style={styles.td}>{obravnava.opis}</td>
+                      <td style={styles.td}>{obravnava.datum}</td>
+                      <td style={styles.td}>{obravnava.izvajalec_id}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
 
 
 
 
-    
+            )}
+
+            <h2>Moji Pozivi</h2>
+            {mojPoziv.length === 0 ? (
+              <p>Ni najdenih pozivov.</p>
+            ) : (
+              <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                <thead>
+                  <tr>
+                    <th style={styles.th}>ID</th>
+                    <th style={styles.th}>Prejemnik_ID</th>
+                    <th style={styles.th}>Izdajatelj_ID</th>
+                    <th style={styles.th}>Datum</th>
+                    <th style={styles.th}>Razlog</th>
+
+                  </tr>
+
+                </thead>
+                <tbody>
+                  {mojPoziv.map((poziv) => (
+                    <tr key={poziv.id}>
+                      <td style={styles.td}>{poziv.id}</td>
+                      <td style={styles.td}>{poziv.prejemnik_id}</td>
+                      <td style={styles.td}>{poziv.izdajatelj_id}</td>
+                      <td style={styles.td}>{poziv.datum}</td>
+                      <td style={styles.td}>{poziv.razlog}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
 
 
-        <h2>Moj elektronski karton</h2>
-    <form
-      onSubmit={async (e) => {
-        e.preventDefault();
-        setKartonMsg("");
-        try {
-          const res = await fetch(`http://localhost:7555/users/karton/${userId}`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            credentials: "include",
-            body: JSON.stringify(mojKarton),
-          });
-          const result = await res.json();
-          if (result.success) {
-            setKartonMsg("✅ Karton uspešno posodobljen.");
-          } else {
-            setKartonMsg(result.message || "Napaka.");
-          }
-        } catch {
-          setKartonMsg("Napaka pri povezavi.");
-        }
-      }}
-    >
-      <label>Težave:</label>
-      <br />
-      <textarea
-        value={mojKarton.tezave || ""}
-        onChange={(e) => setMojKarton({ ...mojKarton, tezave: e.target.value })}
-      />
-      <br />
-
-      <label>Samomeritve:</label>
-      <br />
-      <textarea
-        value={mojKarton.samomeritve || ""}
-        onChange={(e) => setMojKarton({ ...mojKarton, samomeritve: e.target.value })}
-      />
-      <br />
-
-      <label>Zdravila:</label>
-      <br />
-      <textarea
-        value={mojKarton.zdravila || ""}
-        onChange={(e) => setMojKarton({ ...mojKarton, zdravila: e.target.value })}
-      />
-      <br />
 
 
-      <button type="submit" style={styles.button}>Shrani spremembe</button>
-    </form>
-    <p>{kartonMsg}</p>
+            )}
 
 
 
@@ -771,10 +713,68 @@ const handleAddObravnava = async (e) => {
 
 
 
-  </>
-) : ( role === "pacient" && <p>Nalaganje kartona...</p>)}
+            <h2>Moj elektronski karton</h2>
+            <form
+              onSubmit={async (e) => {
+                e.preventDefault();
+                setKartonMsg("");
+                try {
+                  const res = await fetch(`http://localhost:7555/users/karton/${userId}`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    credentials: "include",
+                    body: JSON.stringify(mojKarton),
+                  });
+                  const result = await res.json();
+                  if (result.success) {
+                    setKartonMsg("✅ Karton uspešno posodobljen.");
+                  } else {
+                    setKartonMsg(result.message || "Napaka.");
+                  }
+                } catch {
+                  setKartonMsg("Napaka pri povezavi.");
+                }
+              }}
+            >
+              <label>Težave:</label>
+              <br />
+              <textarea
+                value={mojKarton.tezave || ""}
+                onChange={(e) => setMojKarton({ ...mojKarton, tezave: e.target.value })}
+              />
+              <br />
 
-        
+              <label>Samomeritve:</label>
+              <br />
+              <textarea
+                value={mojKarton.samomeritve || ""}
+                onChange={(e) => setMojKarton({ ...mojKarton, samomeritve: e.target.value })}
+              />
+              <br />
+
+              <label>Zdravila:</label>
+              <br />
+              <textarea
+                value={mojKarton.zdravila || ""}
+                onChange={(e) => setMojKarton({ ...mojKarton, zdravila: e.target.value })}
+              />
+              <br />
+
+
+              <button type="submit" style={styles.button}>Shrani spremembe</button>
+            </form>
+            <p>{kartonMsg}</p>
+
+
+
+
+
+
+
+          </>
+        ) : (role === "pacient" && <p>Nalaganje kartona...</p>)}
+
+
 
         <button onClick={handleLogout} style={{ ...styles.button, background: "#e74c3c" }}>
           Odjava
@@ -805,7 +805,7 @@ const styles = {
     borderRadius: "12px",
     boxShadow: "0 4px 20px rgba(0, 0, 0, 0.2)",
     width: "100%",
-    maxWidth: "900px",  
+    maxWidth: "900px",
     marginBottom: "2rem",
   },
   button: {
@@ -818,7 +818,7 @@ const styles = {
     fontWeight: "bold",
   },
   tableContainer: {
-    width: "100%", 
+    width: "100%",
     overflowX: "auto",
     marginBottom: "2rem",
     background: "#fff",
@@ -828,7 +828,7 @@ const styles = {
   table: {
     width: "100%",
     borderCollapse: "collapse",
-    minWidth: "800px",  
+    minWidth: "800px",
   },
   th: {
     textAlign: "left",
@@ -837,12 +837,12 @@ const styles = {
     backgroundColor: "#e8f0fe",
     color: "#2575fc",
     fontWeight: "600",
-    whiteSpace: "nowrap",  
+    whiteSpace: "nowrap",
   },
   td: {
     padding: "12px 16px",
     borderBottom: "1px solid #ddd",
-    whiteSpace: "nowrap", 
+    whiteSpace: "nowrap",
   },
   trHover: {
     transition: "background-color 0.2s ease",
