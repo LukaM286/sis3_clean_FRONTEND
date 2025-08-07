@@ -176,7 +176,7 @@ useEffect(() => {
 
 
   useEffect(() => {
-  if (role === "zdravnik") {
+  if (role === "zdravnik" || role === "med-sestra") {
     fetch("http://localhost:7555/users/list", {
       credentials: "include",
     })
@@ -195,7 +195,7 @@ useEffect(() => {
 const [kartoni, setKartoni] = useState([]);
 
 useEffect(() => {
-  if (role === "zdravnik") {
+  if (role === "zdravnik" || role === "med-sestra") {
     fetch("http://localhost:7555/users/kartoni", {
       credentials: "include",
     })
@@ -302,6 +302,61 @@ const handleAddObravnava = async (e) => {
         <h1>Dobrodošel, {name}!</h1>
         <p>Vloga: {role}</p>
         <p>ID: {userId}</p>
+
+      {role === "med-sestra" && (
+          <> 
+          <h2 style={{ marginTop: "2rem" }}>Seznam pacientov</h2>
+          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+            <thead>
+              <tr>
+                <th style={styles.th}>ID</th>
+                <th style={styles.th}>Ime</th>
+                <th style={styles.th}>Priimek</th>
+                <th style={styles.th}>Email</th>
+                <th style={styles.th}>Vloga</th>
+              </tr>
+            </thead>
+            <tbody>
+              {allUsers.map((user) => (
+                <tr key={user.id}>
+                  <td style={styles.td}>{user.id}</td>
+                  <td style={styles.td}>{user.ime}</td>
+                  <td style={styles.td}>{user.priimek}</td>
+                  <td style={styles.td}>{user.email}</td>
+                  <td style={styles.td}>{user.vloga_id}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+<br></br>
+          <h2 style={{ marginTop: "2rem" }}>Seznam elektronskih kartonov</h2>
+          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+            <thead>
+              <tr>
+                <th style={styles.th}>Karton ID</th>
+                <th style={styles.th}>Pacient ID</th>
+                <th style={styles.th}>Tezave</th>
+                <th style={styles.th}>Samomeritve</th>
+                <th style={styles.th}>Zdravila</th>
+                
+              </tr>
+            </thead>
+            <tbody>
+              {kartoni.map((karton) => (
+                <tr key={karton.id}>
+                  <td style={styles.td}>{karton.id}</td>
+                  <td style={styles.td}>{karton.pacient_id}</td>
+                  <td style={styles.td}>{karton.tezave || "-"}</td>
+                  <td style={styles.td}>{karton.samomeritve || "-"}</td>
+                  <td style={styles.td}>{karton.zdravila || "-"}</td>
+                </tr>
+              ))}
+            </tbody>
+
+          </table>
+          <br></br>
+                         </>
+        )}
 
 
         {role === "CKZ" && (
@@ -502,7 +557,7 @@ const handleAddObravnava = async (e) => {
 
 <br></br>
 <h2>Seznam obravnav</h2>
-      <table style={{ width: "100%", borderCollapse: "collapse", tableLayout: "auto" }}>
+      <table style={{ width: "auto", borderCollapse: "collapse", tableLayout: "auto" }}>
         <thead>
           <tr>
             <th style={{...styles.th, color: "red"}}>ID</th>
