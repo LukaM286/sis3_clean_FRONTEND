@@ -500,8 +500,36 @@ const handleAddObravnava = async (e) => {
   {deleteKartonMsg}
 </p>
 
-
-
+<br></br>
+<h2>Seznam obravnav</h2>
+      <table style={{ width: "100%", borderCollapse: "collapse", tableLayout: "auto" }}>
+        <thead>
+          <tr>
+            <th style={{...styles.th, color: "red"}}>ID</th>
+            <th style={styles.th}>karton_id</th>
+            <th style={styles.th}>tip_obravnave</th>
+            <th style={styles.th}>opis</th>
+            <th style={styles.th}>datum</th>
+            <th style={styles.th}>izvajalec_id</th>
+            <th style={styles.th}>pacient_id</th>
+            
+          </tr>
+        </thead>
+        <tbody>
+          {obravnave2.map((o) => (
+            <tr key={o.id}>
+              <td style={{...styles.td, color: "red"}}>{o.id}</td>
+              <td style={styles.td}>{o.karton_id}</td>
+              <td style={styles.td}>{o.tip_obravnave}</td>
+              <td style={styles.td}>{o.opis}</td>
+              <td style={styles.td}>{o.datum}</td>
+              <td style={styles.td}>{o.izvajalec_id}</td>
+              <td style={styles.td}>{o.pacient_id}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    
 
 <br></br>
 <form onSubmit={handleAddObravnava}>
@@ -534,7 +562,7 @@ const handleAddObravnava = async (e) => {
   <br></br>
   <input required value={novaObravnava.pacient_id} onChange={e => setNovaObravnava({ ...novaObravnava, pacient_id: e.target.value })} />
 <br></br>
-
+<br></br>
   <button type="submit">Dodaj obravnavo</button>
 </form>
 
