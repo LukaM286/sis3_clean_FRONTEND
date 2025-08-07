@@ -20,6 +20,8 @@ export default function Dashboard() {
   const [obravnave, setObravnave] = useState([]);
   const [diagnoze, setDiagnoze] = useState([]);
   const [selectedObravnava, setSelectedObravnava] = useState(null);
+  const [deleteKartonId, setDeleteKartonId] = useState("");
+  const [deleteKartonMsg, setDeleteKartonMsg] = useState("");
 
 
   const [formData, setFormData] = useState({
@@ -326,6 +328,61 @@ const handleAddObravnava = async (e) => {
   </tbody>
 
 </table>
+<br></br>
+
+<h3 style={{ marginTop: "2rem" }}>Izbriši karton po ID-ju</h3>
+<form
+  onSubmit={async (e) => {
+    e.preventDefault();
+    setDeleteKartonMsg("");
+
+    try {
+      const res = await fetch("http://localhost:7555/users/kartoni/delete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ id: deleteKartonId }),
+      });
+
+      const result = await res.json();
+
+      if (result.success) {
+        setDeleteKartonMsg("✅ Karton uspešno izbrisan.");
+        setDeleteKartonId("");
+
+        const refresh = await fetch("http://localhost:7555/users/kartoni", {
+          credentials: "include",
+        });
+        const data = await refresh.json();
+        if (data.success) setKartoni(data.kartoni);
+      } else {
+        setDeleteKartonMsg(result.message || "Napaka.");
+      }
+    } catch {
+      setDeleteKartonMsg("Napaka pri povezavi s strežnikom.");
+    }
+  }}
+>
+  <label>ID kartona za izbris:</label>
+  <br />
+  <input
+    type="number"
+    required
+    value={deleteKartonId}
+    onChange={(e) => setDeleteKartonId(e.target.value)}
+  />
+  <br />
+  <button type="submit" style={{ ...styles.button, marginTop: "1rem", background: "#e74c3c" }}>
+    Izbriši karton
+  </button>
+</form>
+<p style={{ fontWeight: "bold", color: deleteKartonMsg.includes("✅") ? "green" : "red" }}>
+  {deleteKartonMsg}
+</p>
+
+
+
+
 <br></br>
 <form onSubmit={handleAddObravnava}>
   <br></br>
