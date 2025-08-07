@@ -8,6 +8,8 @@ export default function Dashboard() {
   const [vlogaId, setVlogaId] = useState("");
   const [allUsers, setAllUsers] = useState([]);
   const [userId, setUserId] = useState(null);
+  const [obravnavaId, setObravnavaId] = useState('');
+
 
   const [ckzData, setCkzData] = useState([]);
 
@@ -22,7 +24,45 @@ export default function Dashboard() {
   const [selectedObravnava, setSelectedObravnava] = useState(null);
   const [deleteKartonId, setDeleteKartonId] = useState("");
   const [deleteKartonMsg, setDeleteKartonMsg] = useState("");
+  const [ciljiDosezeni, setCiljiDosezeni] = useState('');
+  const [opombe, setOpombe] = useState('');
+  const [id, setId] = useState('');
+  const [formData2, setFormData2] = useState({
+    id: "",
+    obravnava_id: "",
+    cilji_dosezeni: "",
+    opombe: ""
+  });
 
+  
+const handleAddDosezek = async (e) => {
+  e.preventDefault();
+  setMessage("");
+  
+  console.log("Podatki:", formData2);  
+  
+  try {
+    const response = await fetch("http://localhost:7555/users/new/dosezek", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify(formData),
+    });
+
+    const result = await response.json();
+
+    if (result.success) {
+      setMessage("✅ Dosežek uspešno dodan.");
+      setFormData2({ id: "", obravnava_id: "", cilji_dosezeni: "", opombe: "" });
+    } else {
+      setMessage(result.message || "Napaka pri dodajanju dosezka.");
+    }
+  } catch (error) {
+    setMessage("Napaka pri povezavi s strežnikom.");
+  }
+};
+
+  
 
   const [formData, setFormData] = useState({
     id: "",
@@ -237,6 +277,7 @@ const handleAddObravnava = async (e) => {
       setMessage("Napaka pri povezavi s strežnikom.");
     }
   };
+  
 
   return (
     <div style={styles.container}>
@@ -247,7 +288,30 @@ const handleAddObravnava = async (e) => {
 
 
         {role === "CKZ" && (
-          <> <h2>CKZ DELA</h2>
+          <> <h2></h2>
+<h2>Dodaj nov dosežek</h2>
+<form onSubmit={handleAddDosezek} style={{ textAlign: "left" }}>
+  <label>ID:</label><br />
+  <input name="id" value={formData.id} onChange={handleInputChange} required />
+  <br /><br />
+  <label>Obravnava ID:</label><br />
+  <input name="obravnava_id" value={formData.obravnava_id} onChange={handleInputChange} required />
+  <br /><br />
+  <label>Cilji doseženi:</label><br />
+  <input name="cilji_dosezeni" value={formData.cilji_dosezeni} onChange={handleInputChange} required />
+  <br /><br />
+  <label>Opombe:</label><br />
+  <input name="opombe" value={formData.opombe} onChange={handleInputChange} />
+  <br /><br />
+  <button type="submit" style={{ marginTop: "1rem" }}>
+    Dodaj dosežek
+  </button>
+</form>
+<p style={{ marginTop: "1rem", fontWeight: "bold" }}>{message}</p>
+
+
+ 
+
                  </>
         )}
 
