@@ -27,6 +27,9 @@ export default function Dashboard() {
   const [ciljiDosezeni, setCiljiDosezeni] = useState('');
   const [opombe, setOpombe] = useState('');
   const [id, setId] = useState('');
+
+  const [obravnave2, setObravnave2] = useState([]);
+
   const [formData2, setFormData2] = useState({
     id: "",
     obravnava_id: "",
@@ -61,6 +64,20 @@ const handleAddDosezek = async (e) => {
     setMessage("Napaka pri povezavi s strežnikom.");
   }
 };
+
+useEffect(() => {
+  fetch("http://localhost:7555/users/obravnave", { credentials: "include" })
+    .then(res => res.json())
+    .then(data => {
+      if(data.success) {
+        setObravnave2(data.obravnave);
+      } else {
+        console.error("Napaka pri pridobivanju obravnav:", data.message);
+      }
+    })
+    .catch(err => console.error("Napaka pri povezavi:", err));
+}, []);
+
 
   
 
@@ -288,13 +305,46 @@ const handleAddObravnava = async (e) => {
 
 
         {role === "CKZ" && (
-          <> <h2></h2>
+          <> 
+              <div>
+      <h2>Seznam obravnav</h2>
+      <table style={{ width: "100%", borderCollapse: "collapse", tableLayout: "auto" }}>
+        <thead>
+          <tr>
+            <th style={{...styles.th, color: "red"}}>ID</th>
+            <th style={styles.th}>karton_id</th>
+            <th style={styles.th}>tip_obravnave</th>
+            <th style={styles.th}>opis</th>
+            <th style={styles.th}>datum</th>
+            <th style={styles.th}>izvajalec_id</th>
+            <th style={styles.th}>pacient_id</th>
+            
+          </tr>
+        </thead>
+        <tbody>
+          {obravnave2.map((o) => (
+            <tr key={o.id}>
+              <td style={{...styles.td, color: "red"}}>{o.id}</td>
+              <td style={styles.td}>{o.karton_id}</td>
+              <td style={styles.td}>{o.tip_obravnave}</td>
+              <td style={styles.td}>{o.opis}</td>
+              <td style={styles.td}>{o.datum}</td>
+              <td style={styles.td}>{o.izvajalec_id}</td>
+              <td style={styles.td}>{o.pacient_id}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  
+
+
 <h2>Dodaj nov dosežek</h2>
 <form onSubmit={handleAddDosezek} style={{ textAlign: "left" }}>
-  <label>ID:</label><br />
+  <label >ID:</label><br />
   <input name="id" value={formData.id} onChange={handleInputChange} required />
   <br /><br />
-  <label>Obravnava ID:</label><br />
+  <label style={{color: "red"}}>Obravnava ID:</label><br />
   <input name="obravnava_id" value={formData.obravnava_id} onChange={handleInputChange} required />
   <br /><br />
   <label>Cilji doseženi:</label><br />
