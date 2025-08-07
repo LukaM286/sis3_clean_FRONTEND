@@ -180,7 +180,7 @@ const handleAddObravnava = async (e) => {
     const result = await res.json();
 
     if (result.success) {
-      setObravnavaMsg("✅ Obravnava uspešno dodana.");
+      setObravnavaMsg("Obravnava uspešno dodana.");
       setNovaObravnava({
         id: "",
         karton_id: "",
@@ -244,6 +244,12 @@ const handleAddObravnava = async (e) => {
         <h1>Dobrodošel, {name}!</h1>
         <p>Vloga: {role}</p>
         <p>ID: {userId}</p>
+
+
+        {role === "CKZ" && (
+          <> <h2>CKZ DELA</h2>
+                 </>
+        )}
 
         {role === "zdravnik" && (
           <>
